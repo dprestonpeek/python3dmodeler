@@ -1,0 +1,45 @@
+#fix missing library
+workon coral
+sudo apt-get install libhdf5-dev
+sudo apt-get install libqtgui4
+
+#fix opencv undefine bug
+nano .bashrc
+
+#append on the bottom
+#fix opencv undefine bug
+export LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libatomic.so.1
+
+#save and exit
+#reload bashrc and reboot
+source .bashrc
+reboot
+	
+#use external camera
+sudo apt install fswebcam
+reboot
+
+#edit detect_video.py script
+#line 21 append
+ap.add_argument('--picamera', default="no",
+	help='use pi camera yes/no')
+#line 41 edit
+if(args['picamera'] == 'yes'):
+	print('using Pi camera')
+	vs = VideoStream(src=0).start()
+else:
+	print('using external camera')
+	vs = VideoStream(usePiCamera=False).start()
+time.sleep(2.0)
+
+#start with picamera
+workon coral
+$ python detect_video.py \
+	--model mobilenet_ssd_v2/mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite \
+	--labels mobilenet_ssd_v2/coco_labels.txt --picamera yes
+	
+#start with external camera
+workon coral
+$ python detect_video.py \
+	--model mobilenet_ssd_v2/mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite \
+	--labels mobilenet_ssd_v2/coco_labels.txt
